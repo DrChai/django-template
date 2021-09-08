@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    restart: always
+    container_name: main_db
+    image: postgis/postgis:13-3.1-alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    volumes:
+      - ./data/db/:/var/lib/postgresql/data/
+      - ./data/pg_archive/:/pg_archive/
+    expose:
+      - "${DB_PORT}"
+    env_file:
+      - ".env"
+    ports: # publish ports for debug, accessing with password
+      - "5432:5432"
+  pgbouncer:
+    restart: always
+    container_name: main_pgbouncer
+    image: brainsam/pgbouncer
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASS}
+    links:
+      - db:db
+    expose: # never publish ports for db pool
+      - "6432"
+
+networks:
+  default:
+    external:
+      name: postgres-bridge

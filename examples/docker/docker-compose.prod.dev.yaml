@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  redis:
+    restart: always
+    container_name: main_redis
+    image: redis:latest
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    volumes:
+      - redisdata:/data
+      - ./data/redis:/data
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+  main:
+    restart: unless-stopped
+    build:
+      context: ..
+      args:
+        - DEBUG=true
+    command: ["./start-server.sh", "gunicorn", "-c", "gunicorn_config.py", "{{project_name}}.wsgi:application"]
+  #  command: ./start-server.sh python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - static:/app/static
+      - media:/app/media
+    environment:
+      - VIRTUAL_HOST=
+      - VIRTUAL_PORT=8000
+    expose:
+      - "8000"
+    networks:
+      - web-network
+      - db-network
+      - default
+volumes:
+  media:
+    external:
+      name: nginx-media-pv
+  static:
+    external:
+      name: nginx-static-pv
+networks:
+  web-network:
+    external:
+      name: nginx-bridge
+  db-network:
+    external:
+      name: postgres-bridge

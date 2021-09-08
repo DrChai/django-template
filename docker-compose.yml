@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  main:
+    restart: always
+    build: .
+    container_name: ${APPNAME}_main
+    environment:
+      - DEBUG=true
+      - REDIS_SERVICE=redis
+      - APPNAME=waterh
+    env_file:
+      - "examples/.env"
+    command: ./start-server.sh python manage.py runserver 0.0.0.0:8000
+#    command: ["./start-server.sh", "daphne", "-p", "8000", "-v", "3", "-b", "0.0.0.0", "crosspos.asgi:application"]
+
+volumes:
+  pgdata:
+  redisdata:
+  solrdata:

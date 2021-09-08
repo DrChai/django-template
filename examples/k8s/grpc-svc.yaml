@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{project_name}}-grpc-django-svc
+  labels:
+    tier: backend
+    project: {{project_name}}
+spec:
+  ports:
+  - port: 50051
+    protocol: TCP
+    name: grpc-django
+    targetPort: grpc-port
+  selector:
+    pod: grpc-django-pod
+---   
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{project_name}}-grpc
+  labels:
+    tier: backend
+    project: {{project_name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: grpc-django-pod
+      project: {{project_name}}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/proxyCPU: "10m"
+        sidecar.istio.io/proxyMemory: "50Mi"
+      labels:
+        pod: grpc-django-pod
+        tier: backend
+        project: {{project_name}}
+    spec:
+#      imagePullSecrets:
+#        - name: ..
+#      nodeSelector:
+#        doks.digitalocean.com/node-pool: ..
+      containers:
+      - name: {{project_name}}-grpc-django
+#        image: ..
+        env:
+          - name: DB_SERVICE
+            value: postgres-svc-headless
+          - name: DB_PORT
+            value: "5432"
+          - name: PGB_SERVICE
+            value: pgbouncer-svc-node
+          - name: PGB_PORT
+            value: "6432"
+          - name: REDIS_SERVICE
+            value: redis-svc-headless
+          - name: SOLR_SERVICE
+            value: unset
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{project_name}}-redis
+                key: redis-password
+          - name: SENTRY_ENV
+            value: production
+#          - name: SENTRY_DSN
+#            value: ..
+#          - name: AWS_ACCESS_KEY_ID
+#            value: ..
+#          - name: AWS_SECRET_ACCESS_KEY
+#            value: ..
+        envFrom:
+        - configMapRef:
+            name: {{project_name}}-env-config
+        imagePullPolicy: Always
+        ports:
+        - name: grpc-port
+          containerPort: 50051
+        # command: ["bash"]
+        args: ["python", "manage.py", "grpcserver"]
+
+
+

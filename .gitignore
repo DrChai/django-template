@@ -1,0 +1,35 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+.idea/
+
+# Distribution / packaging
+.Python
+requirements.*.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+### Django ###
+*.log
+*.pot
+*.pyc
+__pycache__/
+media/
+assets/
+static/
+
+db.sqlite3
+### Docker ###
+/.env
+data/
+config/
+examples/docker/docker-compose.override.yml

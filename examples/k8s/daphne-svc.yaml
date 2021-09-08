@@ -1,0 +1,151 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{project_name}}-daphne-svc
+  labels:
+    tier: backend
+    project: {{project_name}}
+spec:
+  ports:
+  - port: 8000
+    name: http-daphne
+    targetPort: daphne-port
+  - port: 80
+    name: http-nginx
+    targetPort: nginx-port
+  selector:
+    pod: daphne-pod
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{project_name}}-nginx-config
+  labels:
+    project: {{project_name}}
+data:
+  default.conf: |-
+   server {
+    client_max_body_size 10m;
+    listen 80;
+    server_name _;
+    charset utf-8;
+    location /admin/ {
+      proxy_pass http://127.0.0.1:8000;
+      proxy_set_header Host $http_host;
+    }
+    location /django-static/ {
+      alias /data/{{project_name}}-static/;
+    }
+    location /media/ {
+      alias /data/{{project_name}}-media/;
+    }
+   }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{project_name}}-django
+  labels:
+    tier: backend
+    project: {{project_name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: daphne-pod
+      project: {{project_name}}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/proxyCPU: "10m"
+        sidecar.istio.io/proxyMemory: "50Mi"
+      labels:
+        pod: daphne-pod
+        tier: backend
+        project: {{project_name}}
+    spec:
+      imagePullSecrets:
+        - name: acr
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - redis
+                - key: project
+                  operator: In
+                  values:
+                  - {{project_name}}
+              topologyKey: kubernetes.io/hostname
+#      nodeSelector:
+#        doks.digitalocean.com/node-pool: ..
+      containers:
+      - name: {{project_name}}-daphne
+#        image: ...
+        env:
+          - name: DB_SERVICE
+            value: postgres-svc-headless
+          - name: DB_PORT
+            value: "5432"
+          - name: PGB_SERVICE
+            value: pgbouncer-svc-node
+          - name: PGB_PORT
+            value: "6432"
+          - name: REDIS_SERVICE
+            value: redis-svc-headless
+          - name: SOLR_SERVICE
+            value: unset
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{project_name}}-redis
+                key: redis-password
+          - name: SENTRY_ENV
+            value: production
+#          - name: SENTRY_DSN
+#            value:
+#          - name: AWS_ACCESS_KEY_ID
+#            value:
+#          - name: AWS_SECRET_ACCESS_KEY
+#            value:
+        envFrom:
+        - configMapRef:
+            name: {{project_name}}-env-config
+        volumeMounts:
+          - mountPath: /app/media
+            name: {{project_name}}-data
+            subPath: {{project_name}}-media
+          - mountPath: /app/static
+            name: {{project_name}}-data
+            subPath: {{project_name}}-static
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+        ports:
+        - name: daphne-port
+          containerPort: 8000
+        # command: ["bash"]
+        args: ["./start-server.sh", "daphne", "-p", "8000", "-v", "2", "-b", "0.0.0.0", "{{project_name}}.asgi:application"]
+        # args: ["./start-server.sh", "gunicorn", "-c", "gunicorn_config.py", "{{project_name}}.wsgi:application"]
+      - name: {{project_name}}-nginx
+        image: nginx:alpine
+        volumeMounts:
+          - name: {{project_name}}-data
+            mountPath: /data
+          - name: {{project_name}}-nginx-config
+            mountPath: /etc/nginx/conf.d
+            readOnly: true
+        ports:
+        - name: nginx-port
+          containerPort: 80
+      volumes:
+      - name: {{project_name}}-data
+        persistentVolumeClaim:
+          claimName: {{project_name}}-pvc
+      - name: {{project_name}}-nginx-config
+        configMap:
+          name: {{project_name}}-nginx-config

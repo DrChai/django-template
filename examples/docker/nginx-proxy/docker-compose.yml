@@ -1,0 +1,28 @@
+version: '3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./cloudflare_params:/etc/nginx/cloudflare_params
+      - ./certs:/etc/nginx/certs:ro
+      # Generate default certs: sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/default.key -out ./certs/default.crt
+      - static:/static:ro
+      - media:/media:ro
+      - ./vhost.d:/etc/nginx/vhost.d/
+networks:
+  default:
+    external:
+      name: nginx-bridge
+volumes:
+  media:
+    external:
+      name: nginx-media-pv
+  static:
+    external:
+      name: nginx-static-pv
