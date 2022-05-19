@@ -1,13 +1,12 @@
-version: '3'
-
 services:
   main:
     restart: unless-stopped
     ports:
       - "8000:8000"
     build:
-      context: ..
+      context: .
       args:
         - DEBUG=true
     volumes:
-    - ./media:/app/media/
+    - ./media:/app/media
+    - ./db.sqlite3:/app/db.sqlite3

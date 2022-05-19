@@ -1,26 +1,39 @@
-FROM python:slim
-ENV PYTHONUNBUFFERED 1
-ARG DEBUG=false
-RUN mkdir /app
+# build stage
+FROM python:slim AS builder
+# install Python/Django depencies
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends pipenv \
+    && apt-get install -y --no-install-recommends \
     # Geospatial
     binutils libproj-dev gdal-bin \
-    # Optional1
-#    g++ apt-utils gcc libssl-dev openssl curl \
-    # Optional2
-#    git curl \
+    # Optional
+#    g++ apt-utils gcc libssl-dev \
+    # Optional
+#    git curl openssl \
     && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+RUN pip install -U pip setuptools wheel
+RUN pip install pdm
+
+# copy files
+COPY pyproject.toml pdm.lock /app/
+COPY . /app/src
+
+# install PDM
+ARG DEBUG=false
+RUN pdm install --prod --no-lock --no-editable
+RUN if [ "$DEBUG" = "true" ] ; then pdm install -G dev --no-lock --no-editable; fi
+
+
+# run stage
+FROM python:slim AS runner
+ENV PYTHONPATH=/app/pkgs
+ENV PYTHONUNBUFFERED 1
+
+COPY --from=builder /app/__pypackages__/3.*/lib /app/pkgs
+COPY --from=builder /app/src /app
 
 WORKDIR /app
-
-COPY Pipfile Pipfile
-#running: docker run -it --rm -v $PWD:/app -w /app python:3-slim
-COPY Pipfile.lock Pipfile.lock
-#RUN pip install -U pip pipenv
-ADD . /app/
-RUN chmod a+x /app/entrypoint.sh
-RUN if [ "$DEBUG" = "true" ] ; then pipenv install --dev --deploy --system; else pipenv install --deploy --system ; fi
+RUN chmod u+x entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 EXPOSE 8000
 VOLUME ["/app/static", "/app/media"]

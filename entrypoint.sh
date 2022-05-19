@@ -7,7 +7,7 @@ if [ -z "APPNAME" ]; then
   exit 1
 fi
 echo "You are running $APP_NAME as name of your app"
-cp  ./examples/settings_override.prod.py /app/${APP_NAME}/settings_override.py
+cp  ./docker.settings_override.py /app/${APP_NAME}/settings_override.py
 # shift  # drops first parameter
 # export APPNAME  # makes it an environment variable
 exec "$@"

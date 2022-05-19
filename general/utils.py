@@ -5,7 +5,7 @@ from django.core.mail import EmailMessage
 from django.http import Http404
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, status
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response

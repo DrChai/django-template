@@ -1,26 +1,46 @@
 [tool.poetry]
-name = "{project_name}"
+name = "{{project_name}}"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["{{author_name}} <{{author_email}}>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-Django = "^3.2.7"
-pytz = "^2021.1"
-celery = "^5.1.2"
+Django = "^4.0.4"
+pytz = "^2022.1"
+celery = "^5.2.6"
 Pillow = "^8.3.2"
 gunicorn = "^20.1.0"
-gevent = "^21.8.0"
-djangorestframework = "^3.12.4"
-django-auth-framework = "^1.0.3"
-django-oauth-toolkit = "^1.5.0"
-django-cors-headers = "^3.8.0"
-django-redis-cache = "^3.0.0"
+gevent = "<22.0>"
+djangorestframework = "<4.0"
+django-auth-framework = "^2.0.1"
+django-oauth-toolkit = "^2.0.0"
+django-cors-headers = "<4.0>"
+redis = "^4.3.1"
 
 [tool.poetry.dev-dependencies]
-django-debug-toolbar = "^3.2.2"
+django-debug-toolbar = "<4.0"
 
+
+[tool.pdm]
+includes = []
+[tool.pdm.dev-dependencies]
+dev = [
+    "django-debug-toolbar<4.0",
+]
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[project]
+name = "{{project_name}}"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "{{author_name}}", email = "{{author_email}}"},
+]
+dependencies = ["Django<5.0.0,>=4.0.4", "pytz<2023.0,>=2022.1", "celery<6.0.0,>=5.2.6", "Pillow<9.0.0,>=8.3.2", "gunicorn<21.0.0,>=20.1.0", "gevent<22.0>", "djangorestframework<4.0", "django-auth-framework<3.0.0,>=2.0.1", "django-oauth-toolkit<3.0.0,>=2.0.0", "django-cors-headers<4.0>", "redis<5.0.0,>=4.3.1"]
+requires-python = ">=3.8,<4.0"
+license = {text = "MIT"}
+
+[project.urls]

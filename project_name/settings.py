@@ -5,33 +5,26 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.getenv('DEBUG', 'NO').lower() in ('on', 'true', 'y', 'yes')
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'staging').lower()
 ALLOWED_HOSTS = [
-    '127.0.0.1',
+    '127.0.0.1', 'localhost',
+    '0.0.0.0',  # running in docker
     '.{0}'.format(os.environ['WEB_DOMAIN']),
 ]
 
-CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+CSRF_TRUSTED_ORIGINS = ['https://*.{0}'.format(os.environ['WEB_DOMAIN']),]
+STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
 # Application Settings ###
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-]
 REQUIRED_APPS = [
-    'auth_framework',
     # RESTful
     'rest_framework',
     'oauth2_provider',
     'corsheaders',
     # Other
+    'auth_framework',
 ]
 LOCAL_APPS = [
-    'auth',
+    'auth.apps.AuthConfig',
 ]
 INSTALLED_APPS += REQUIRED_APPS
 INSTALLED_APPS += LOCAL_APPS
@@ -49,7 +42,7 @@ MIDDLEWARE = [
 ]
 
 # Authentication Settings ###
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'custom_auth.User'
 AUTH_PASSWORD_VALIDATORS = [  # Reset Auth Password Validators for customization
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
