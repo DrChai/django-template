@@ -3,11 +3,11 @@ services:
   main:
     restart: always
     build: .
-    container_name: ${APPNAME}_main
+    container_name: ${APPNAME:-{{project_name}}}_main
     environment:
       - DEBUG=true
       - REDIS_SERVICE=redis
-      - APPNAME=${APPNAME}
+      - APPNAME=${APPNAME:-{{project_name}}}
     command: ./start-server.sh python manage.py runserver 0.0.0.0:8000
 
 volumes:

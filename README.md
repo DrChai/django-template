@@ -6,8 +6,9 @@ a homemade django template for my remote cluster and local development
 $ django-admin startproject \
   --template=https://github.com/DrChai/django-template/archive/main.zip \
   --extension=py,yml,yaml,env,toml \
-  project_name  
-$ mv config/env .env # then edit
+  your_project_name
+$ cd your_project_name  
+$ cp config/.env . # then edit
 # Generate up-to-date lock file: pdm lock / poetry lock
 
 ```

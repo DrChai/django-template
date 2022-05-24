@@ -9,3 +9,9 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    @classmethod
+    def get_fields(cls):
+        # strip out private fields for DRF serializers
+        return tuple(set(map(lambda field: field.name, cls._meta.local_fields)) -
+                     {'password', 'is_superuser', 'is_active', 'last_login', 'is_staff', 'date_joined'})
