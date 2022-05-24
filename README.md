@@ -15,21 +15,22 @@ $ cp config/.env . # then edit
 ## Running as Docker Container
 ### Docker build
 ```shell
-$ cp config/docker/python:slim/Dockerfile .
+$ cp config/docker/python:slim/Dockerfile . # alpine version: config/docker/python:alpine/Dockerfile
 $ cp config/settings_override.dev.py ./docker.settings_override.py
 $ docker build -t ctn_name . # build for production
 $ docker build -t ctn_name --build-arg DEBUG=true . # build for development
 ```
 ### Docker run (local development)
 ```shell
-$ touch db.sqlit3 # create a db file for volume mapping if needed
-$ docker run --rm -it --env-file .env -p 8000:8000 -v $PWD/db.sqlit3:/app/db.sqlit3 ctn_name ./start-server.sh python manage.py runserver 0.0.0.0:8000
+$ touch db.sqlite3 # create a db file for volume mapping if needed for local development
+$ docker run --rm -it --env-file .env -p 8000:8000 -v $PWD/db.sqlite3:/app/db.sqlite3 ctn_name ./start-server.sh python manage.py runserver 0.0.0.0:8000
 ```
-## Running as Docker Compose
+## Running with Docker Compose
 ```shell
-$ touch db.sqlit3 # create a db file for volume mapping if needed
-$ cp config/settings_override.dev.py ./docker.settings_override.py
-$ cp config/docker-compose/docker-compose.override.dev.yml docker-compose.override.yml
+$ touch db.sqlite3 # create a db file for volume mapping if needed for local development
+$ cp config/docker/python:slim/Dockerfile .
+$ cp config/settings_override.dev.py ./docker.settings_override.py # a production version for example: config/settings_override.prod.py
+$ cp config/docker-compose/docker-compose.override.dev.yml docker-compose.override.yml # a production version for example: config/docker-compose/docker-compose.override.prod.yml
 $ docker-compose up --build -d
 ```
 ## Examples of production configuration

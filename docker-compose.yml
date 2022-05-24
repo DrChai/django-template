@@ -8,8 +8,9 @@ services:
       - DEBUG=true
       - REDIS_SERVICE=redis
       - APPNAME=${APPNAME:-{{project_name}}}
+    env_file:
+      - .env
     command: ./start-server.sh python manage.py runserver 0.0.0.0:8000
-
 volumes:
   pgdata:
   redisdata:

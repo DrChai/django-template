@@ -2,7 +2,7 @@
 name = "{{project_name}}"
 version = "0.1.0"
 description = ""
-authors = ["{{author_name}} <{{author_email}}>"]
+authors = ["{% templatetag openvariable %}author_name{% templatetag closevariable %} <{% templatetag openvariable %}author_email{% templatetag closevariable %}>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -37,9 +37,21 @@ name = "{{project_name}}"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "{{author_name}}", email = "{{author_email}}"},
+    {name = "{% templatetag openvariable %}author_name{% templatetag closevariable %}", email = "{% templatetag openvariable %}author_email{% templatetag closevariable %}"},
 ]
-dependencies = ["Django<5.0.0,>=4.0.4", "pytz<2023.0,>=2022.1", "celery<6.0.0,>=5.2.6", "Pillow<9.0.0,>=8.3.2", "gunicorn<21.0.0,>=20.1.0", "gevent<22.0>", "djangorestframework<4.0", "django-auth-framework<3.0.0,>=2.0.1", "django-oauth-toolkit<3.0.0,>=2.0.0", "django-cors-headers<4.0>", "redis<5.0.0,>=4.3.1"]
+dependencies = [
+    "Django<5.0.0,>=4.0.4",
+    "pytz<2023.0,>=2022.1",
+    "celery<6.0.0,>=5.2.6",
+    "Pillow<9.0.0,>=8.3.2",
+    "gunicorn<21.0.0,>=20.1.0",
+    "gevent<22.0>",
+    "djangorestframework<4.0",
+    "django-auth-framework<3.0.0,>=2.0.1",
+    "django-oauth-toolkit<3.0.0,>=2.0.0",
+    "django-cors-headers<4.0>",
+    "redis<5.0.0,>=4.3.1"
+]
 requires-python = ">=3.8,<4.0"
 license = {text = "MIT"}
 
