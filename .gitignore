@@ -31,5 +31,4 @@ db.sqlite3
 ### Docker ###
 /.env
 data/
-config/
 examples/docker/docker-compose.override.yml

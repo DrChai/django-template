@@ -1,15 +1,14 @@
 # build stage
-FROM python:slim AS builder
+FROM python:alpine AS builder
 # install Python/Django depencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    # Geospatial
-    binutils libproj-dev gdal-bin \
-    # Optional
-#    g++ apt-utils gcc libssl-dev \
-    # Optional
-#    git curl openssl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --update --no-ache --virtual .tmp \
+    gcc libc-dev linux-headers make \
+    # pillow
+    jpeg-dev zlib-dev \
+    # cffi
+    libffi-dev \
+    # postgres (alt. option: musl-dev postgresql-dev)
+    libpq-dev
 WORKDIR /app
 RUN pip install -U pip setuptools wheel
 RUN pip install pdm
@@ -23,15 +22,12 @@ ARG DEBUG=false
 RUN pdm install --prod --no-lock --no-editable
 RUN if [ "$DEBUG" = "true" ] ; then pdm install -G dev --no-lock --no-editable; fi
 
-
 # run stage
-FROM python:slim AS runner
+FROM python:alpine AS production
 ENV PYTHONPATH=/app/pkgs
 ENV PYTHONUNBUFFERED 1
-
 COPY --from=builder /app/__pypackages__/3.*/lib /app/pkgs
 COPY --from=builder /app/src /app
-
 WORKDIR /app
 RUN chmod u+x entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
