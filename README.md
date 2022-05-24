@@ -16,8 +16,8 @@ $ mv config/env .env # then edit
 ```shell
 $ cp config/docker/python:slim/Dockerfile .
 $ cp config/settings_override.dev.py ./docker.settings_override.py
-docker build -t ctn_name . # build for production
-docker build -t ctn_name --build-arg DEBUG=true . # build for development
+$ docker build -t ctn_name . # build for production
+$ docker build -t ctn_name --build-arg DEBUG=true . # build for development
 ```
 ### Docker run (local development)
 ```shell
@@ -32,5 +32,5 @@ $ cp config/docker-compose/docker-compose.override.dev.yml docker-compose.overri
 $ docker-compose up --build -d
 ```
 ## Examples of production configuration
-* [**Docker**](https://github.com/DrChai/django-template/tree/main/examples/docker)
-* [**Kubernetes**](https://github.com/DrChai/django-template/tree/main/examples/k8s)
+* [**Docker**](https://github.com/DrChai/django-template/tree/main/config/docker)
+* [**Kubernetes**](https://github.com/DrChai/django-template/tree/main/config/k8s)
