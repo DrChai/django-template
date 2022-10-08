@@ -53,7 +53,7 @@ AUTH_PASSWORD_VALIDATORS = [  # Reset Auth Password Validators for customization
 ]
 
 AUTH_FRAMEWORK = {
-    'WITH_PHONENUMBER_FIELD': False,
+    'USE_PHONENUMBER_FIELD': False,
     'USE_PASSWORD_TWICE_VALIDATION': False,
     'SERIALIZERS': {
         'SIGNUP_SERIALIZER': 'auth.serializers.ExtendSignUpSerializer',
@@ -67,7 +67,7 @@ AUTHENTICATION_BACKENDS = [
 
 OAUTH2_PROVIDER = {
     "OIDC_ENABLED": True,
-    "OIDC_RSA_PRIVATE_KEY": os.environ.get('OIDC_RSA_PRIVATE_KEY'),
+    "OIDC_RSA_PRIVATE_KEY": os.environ.get('OIDC_RSA_PRIVATE_KEY', '').replace(r'\n', '\n').strip(),
     'SCOPES': {
         "openid": "OpenID Connect scope",
         'read': 'Read scope',
@@ -125,6 +125,7 @@ if os.environ.get('SENTRY_DSN'):
         send_default_pii=True,
         environment=ENVIRONMENT
     )
+# Solr Search Engine
 if os.environ.get('SOLR_SERVICE'):
     HAYSTACK_CONNECTIONS = {
         'default': {
@@ -133,9 +134,8 @@ if os.environ.get('SOLR_SERVICE'):
         },
     }
 # Celery
-if os.environ.get('SOLR_SERVICE'):
-    CELERY_BROKER_URL = 'redis://:{0}{1}:6379/0'.format(os.environ['REDIS_PASSWORD'],
-                                                         os.environ['REDIS_SERVICE'])
+if os.environ.get('CELERY_SERVICE'):
+    CELERY_BROKER_URL = 'redis://:{0}@{1}:6379/0'.format(os.environ['REDIS_PASSWORD'], os.environ['REDIS_SERVICE'])
     CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 try:

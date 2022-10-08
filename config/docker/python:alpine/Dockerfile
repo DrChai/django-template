@@ -26,7 +26,9 @@ RUN if [ "$DEBUG" = "true" ] ; then pdm install -G dev --no-lock --no-editable; 
 FROM python:alpine AS production
 ENV PYTHONPATH=/app/pkgs
 ENV PYTHONUNBUFFERED 1
+ENV PATH "/app/bin:${PATH}"
 COPY --from=builder /app/__pypackages__/3.*/lib /app/pkgs
+COPY --from=builder /app/__pypackages__/3.*/bin /app/bin
 COPY --from=builder /app/src /app
 WORKDIR /app
 RUN chmod u+x entrypoint.sh

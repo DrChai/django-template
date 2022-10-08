@@ -17,7 +17,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://:{0}@{1}:6379/1'.format(
+        'LOCATION': 'redis://{2}:{0}@{1}:6379/1'.format(
             os.environ['REDIS_PASSWORD'],
             os.environ['REDIS_SERVICE'],
             os.environ.get('REDIS_USER', '')

@@ -46,7 +46,7 @@ RUN cd geos/build \
     && rm -rf geos
 
 # Build GDAL
-ARG GDAL_VERSION=v3.5.0
+ARG GDAL_VERSION=v3.5.2
 # add GDAL build deps
 RUN apk add --no-cache \
     linux-headers tiff-dev
@@ -79,8 +79,8 @@ COPY --from=builder  /build/gdal/usr/lib/ /geos/usr/lib/
 COPY --from=builder  /build/geos/usr/lib/ /geos/usr/lib/
 RUN find /geos/usr/lib/ -type l | xargs -i ln -sf {} /usr/lib/
 RUN find /geos/usr/lib/libproj.so.* -type f | xargs -i ln -sf {} /usr/lib/
-# don't import proj.db
-# COPY --from=builder  /build/proj/usr/share/proj/ /usr/share/proj/
+# import proj.db as optional
+COPY --from=builder  /build/proj/usr/share/proj/ /geos/usr/share/proj/
 # runtime deps
 RUN apk add --no-cache \
     # binutils to fix ctypes.util.find_library broken

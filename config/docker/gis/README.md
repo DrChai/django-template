@@ -28,6 +28,8 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 EXPOSE 8000
 ```
 * use this image as a “stage”. The libs are already saved at `/geos/usr/libs` directory.
+  proj resources(includes proj.db) at `/geos/usr/share/proj/`. 
+  ***Don't forget to pull the latest alpine, otherwise shared libs may be broken on your container.***
 ```dockerfile
 FROM python:alpine
 COPY --from=carrycat/gis  /geos/usr/lib/ /usr/lib/

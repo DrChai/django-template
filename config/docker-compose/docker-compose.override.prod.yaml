@@ -2,7 +2,7 @@ services:
   redis:
     restart: always
     container_name: main_redis
-    image: redis:latest
+    image: redis:alpine
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     volumes:
       - redisdata:/data
