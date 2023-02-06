@@ -52,7 +52,7 @@ RUN cd geos/build \
     && rm -rf geos
 
 # Build GDAL
-ARG GDAL_VERSION=v3.5.0
+ARG GDAL_VERSION=master
 # add GDAL build deps
 RUN set -eux; \
 	apt-get update; \
@@ -86,8 +86,11 @@ COPY --from=builder  /build/proj/usr/lib/ /geos/usr/lib/
 COPY --from=builder  /build/gdal/usr/lib/ /geos/usr/lib/
 COPY --from=builder  /build/geos/usr/lib/ /geos/usr/lib/
 RUN find /geos/usr/lib/ -type l | xargs -i ln -sf {} /usr/lib/*-linux-gnu/
+RUN find /geos/usr/lib/lib* -type f | xargs -i ln -sf {} /usr/lib/*-linux-gnu/
+
 # add runtime deps
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
     libjpeg-dev binutils
+ENV PYTHONUNBUFFERED 1

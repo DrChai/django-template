@@ -1,4 +1,5 @@
-FROM alpine:latest AS builder
+ARG ALPINE_VERSION=3.17
+FROM alpine:${ALPINE_VERSION} as builder
 LABEL maintainer="Ed Chai <edwardc@acrossor.com>"
 # add build environment deps
 RUN apk add --no-cache make g++ cmake
@@ -46,7 +47,7 @@ RUN cd geos/build \
     && rm -rf geos
 
 # Build GDAL
-ARG GDAL_VERSION=v3.5.2
+ARG GDAL_VERSION=master
 # add GDAL build deps
 RUN apk add --no-cache \
     linux-headers tiff-dev
@@ -73,16 +74,18 @@ RUN cd gdal/build \
     && rm -rf gdal
 
 # Build final image
-FROM python:alpine AS runner
+#FROM python:3.11-alpine${ALPINE_VERSION} AS runner
+FROM alpine:${ALPINE_VERSION} AS runner
 COPY --from=builder  /build/proj/usr/lib/ /geos/usr/lib/
 COPY --from=builder  /build/gdal/usr/lib/ /geos/usr/lib/
 COPY --from=builder  /build/geos/usr/lib/ /geos/usr/lib/
 RUN find /geos/usr/lib/ -type l | xargs -i ln -sf {} /usr/lib/
-RUN find /geos/usr/lib/libproj.so.* -type f | xargs -i ln -sf {} /usr/lib/
+RUN find /geos/usr/lib/lib* -type f | xargs -i ln -sf {} /usr/lib/
+
 # import proj.db as optional
-COPY --from=builder  /build/proj/usr/share/proj/ /geos/usr/share/proj/
+#COPY --from=builder  /build/proj/usr/share/proj/ /geos/usr/share/proj/
 # runtime deps
-RUN apk add --no-cache \
-    # binutils to fix ctypes.util.find_library broken
-    libstdc++ libjpeg-turbo binutils \
-    && rm -f /usr/lib/libturbojpeg.so*
+#RUN apk add --no-cache \
+#    # binutils or gcc to fix ctypes.util.find_library broken
+#    libstdc++ binutils libjpeg-turbo \
+#    && rm -f /usr/lib/libturbojpeg.so*
