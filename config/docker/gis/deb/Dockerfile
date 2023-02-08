@@ -74,7 +74,6 @@ RUN cd gdal/build \
     -DGDAL_USE_TIFF_INTERNAL=ON \
     -DGDAL_USE_GEOTIFF_INTERNAL=ON \
     -DGDAL_USE_JSONC_INTERNAL=ON \
-    -DGDAL_USE_PNG_INTERNAL=ON \
     && cmake --build . \
     && cmake --build . --target install -- DESTDIR=/build/gdal \
     && cd / \
